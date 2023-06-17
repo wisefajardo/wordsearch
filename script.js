@@ -1,10 +1,6 @@
 // Word sets for each level
-const wordSets = [
-  ['WORD', 'SEARCH', 'GAME'],
-  ['OPEN', 'AI', 'GPT'],
-  ['DEVELOPER', 'PROGRAMMER', 'CODING'],
-  ['PUZZLE', 'CHALLENGE', 'BRAIN'],
-];
+const MAX_WORDS_PER_SET = 20; // Maximum number of words per word set
+const wordSets = [[]]; // Array to store word sets
 
 const ROW_DIRECTIONS = [-1, -1, 0, 1, 1, 1, 0, -1];
 const COL_DIRECTIONS = [0, 1, 1, 1, 0, -1, -1, -1];
@@ -16,6 +12,199 @@ let wordSearchGrid; // Word search grid for the current level (will be initializ
 let selectedCells = []; // Track selected cells to form a word
 let selectedWordString = ''; // Store the selected word string
 let roundEnded = false;
+
+function getWordSet(){
+	// Function to handle the submit button click event
+function handleSubmitButtonClick() {
+  const inputField = document.getElementById('wordInput');
+  const newWordSetButton = document.getElementById('newWordSetButton');
+  const startGameButton = document.getElementById('startGameButton');
+  const word = inputField.value.trim().toUpperCase();
+  if (word === '') {
+    return;
+  }
+  
+  // Add the word to the current word set if it's not already present
+  const currentWordSet = wordSets[wordSets.length - 1];
+  if (!currentWordSet.includes(word)) {
+	currentWordSet.push(word);
+  } else {
+    console.log('Word is already in the list.');
+  }
+
+  //Check if there is at least one word in the word set and enable the start game button if true
+  if (wordSets[wordSets.length - 1].length > 0) {
+    startGameButton.disabled = false;
+	newWordSetButton.disabled = false;
+  }else{
+	  //Disable the start game button if there are no words in the word set
+	  startGameButton.disabled = true;
+	  newWordSetButton.disabled = true;
+  }
+
+
+  // Clear the input field
+  inputField.value = '';
+
+  // Render the word set as a list
+  renderWordSet(currentWordSet);
+
+  // Disable input field if the word set limit is reached
+  if (currentWordSet.length >= MAX_WORDS_PER_SET) {
+    inputField.disabled = true;
+  }
+   // Render all word sets
+  renderAllWordSets();
+}
+
+// Function to handle the start game button click event
+function handleStartGameButtonClick() {
+  if (wordSets[wordSets.length - 1].length > 0) {
+    // Hide the input field and buttons
+    const wordInputContainer = document.getElementById('wordInputContainer');
+    wordInputContainer.classList.add('hidden');
+
+
+	const wordSetsLabel = document.getElementById('wordSetsLabel');
+    wordSetsLabel.classList.add('hidden');
+
+    // Display the word sets as lists
+    const wordSetsContainer = document.getElementById('wordSetsContainer');
+    wordSetsContainer.classList.add('hidden');
+    renderAllWordSets();
+
+    // Show the level, grid, and found words
+    const levelContainer = document.getElementById('levelContainer');
+    levelContainer.classList.remove('hidden');
+
+    const gridContainer = document.getElementById('gridContainer');
+    gridContainer.classList.remove('hidden');
+
+    const foundWordsContainer = document.getElementById('foundWordsContainer');
+    foundWordsContainer.classList.remove('hidden');
+
+  currentLevel = 0;
+	wordsToFind = wordSets[currentLevel];
+	console.log('Word set:',wordsToFind);
+    // Initialize the game
+    initializeGame();
+  } else {
+    console.log('Please enter at least one word set before starting the game.');
+  }
+}
+
+
+// Function to render a word set as a list
+function renderWordSet(wordSet) {
+  const wordSetsContainer = document.getElementById('wordSetsContainer');
+  wordSetsContainer.classList.remove("hidden");
+
+  // Create a new list element
+  const list = document.createElement('ul');
+  list.classList.add('word-set');
+
+  // Create list items for each word
+  for (const word of wordSet) {
+    const listItem = document.createElement('li');
+    listItem.textContent = word;
+    list.appendChild(listItem);
+  }
+
+  // Append the list to the container
+  wordSetsContainer.appendChild(list);
+}
+
+// Function to render all word sets
+function renderAllWordSets() {
+  const wordSetsContainer = document.getElementById('wordSetsContainer');
+
+  // Clear the container
+  wordSetsContainer.innerHTML = '';
+
+  // Render each word set as a list
+  for (let i = 0; i < wordSets.length; i++) {
+    const wordSet = wordSets[i];
+    const setNumber = i + 1;
+
+    // Create a new list element
+    const list = document.createElement('ul');
+    list.classList.add('word-set');
+
+    // Create list items for each word
+    for (const word of wordSet) {
+      const listItem = document.createElement('li');
+      listItem.textContent = word;
+      list.appendChild(listItem);
+    }
+
+    // Create a list item for the set number indicator
+    const setIndicator = document.createElement('li');
+    setIndicator.classList.add('set-indicator');
+    setIndicator.textContent = `Set ${setNumber}`;
+
+    // Append the set number indicator and the list to the container
+    wordSetsContainer.appendChild(setIndicator);
+    wordSetsContainer.appendChild(list);
+  }
+}
+
+// Function to handle the enter key press event in the input field
+function handleInputFieldKeyPress(event) {
+  if (event.key === 'Enter') {
+    handleSubmitButtonClick();
+  }
+}
+
+// Function to handle the create new word set button click event
+function handleNewWordSetButtonClick() {
+	
+	if (wordSets[wordSets.length - 1].length <= 0) {
+		console.log('Please enter at least one word set before creating another word set');
+		return;
+	}
+	
+  // Create a new empty word set
+  wordSets.push([]);
+
+  // Clear the input field and enable it
+  const inputField = document.getElementById('wordInput');
+  inputField.value = '';
+  inputField.disabled = false;
+
+  // Hide the word sets container
+  const wordSetsContainer = document.getElementById('wordSetsContainer');
+  wordSetsContainer.classList.add('hidden');
+
+  // Show the input field and buttons
+  const wordInputContainer = document.getElementById('wordInputContainer');
+  wordInputContainer.classList.remove('hidden');
+
+  // Focus on the input field
+  inputField.focus();
+
+  // Render the new word set
+  renderWordSet(wordSets[wordSets.length - 1]);
+
+  // Render all word sets (including the new set)
+  renderAllWordSets();
+}
+
+
+
+// Add event listeners to the buttons and input field
+const submitButton = document.getElementById('submitButton');
+submitButton.addEventListener('click', handleSubmitButtonClick);
+submitButton.disabled = false;
+
+const startGameButton = document.getElementById('startGameButton');
+startGameButton.addEventListener('click', handleStartGameButtonClick);
+
+const inputField = document.getElementById('wordInput');
+inputField.addEventListener('keypress', handleInputFieldKeyPress);
+
+const newWordSetButton = document.getElementById('newWordSetButton');
+newWordSetButton.addEventListener('click', handleNewWordSetButtonClick);
+}
 
 // Function to generate the word search grid
 function generateWordSearchGrid(wordSet) {
@@ -58,6 +247,7 @@ function generateWordSearchGrid(wordSet) {
 
   return grid;
 }
+
 
 // Function to generate a random letter
 function getRandomLetter() {
@@ -219,13 +409,11 @@ function checkGameStatus() {
     roundEnded = true;
     document.removeEventListener('click', handleCellClick);
 	
-	// Enable the submit button
-    const submitButton = document.getElementById('submitButton');
-    submitButton.disabled = false;
-	} else {
-    // Disable the submit button
-    const submitButton = document.getElementById('submitButton');
-    submitButton.disabled = true;
+	const nextButton = document.getElementById('nextButton');
+	// Add event listener to the submit button
+	nextButton.addEventListener('click', handleNextButtonClick);
+    nextButton.classList.remove('hidden');
+	nextButton.disabled = false;
 	}
 }
 
@@ -242,6 +430,8 @@ function initializeGame() {
   updateLevelIndicator();
   renderWordSearchGrid(wordSearchGrid);
   renderFoundWords();
+  const nextButton = document.getElementById('nextButton');
+  nextButton.classList.add('hidden');
   document.addEventListener('click', handleCellClick);
 }
 
@@ -255,17 +445,23 @@ function changeLevel() {
   successMessage.classList.add('hidden');
   updateLevelIndicator();
   initializeGame();
+  
+  roundEnded = false;
+  
+  // Add the event listener back to the grid container
+  const gridContainer = document.getElementById('gridContainer');
+  gridContainer.addEventListener('click', handleCellClick);
 }
 
-// Function to handle the submit button click event
-function handleSubmitButtonClick() {
+//Function to handle the submit button click event
+function handleNextButtonClick() {
   changeLevel();
 }
 
-// Initialize the game
-initializeGame();
-
-// Add event listener to the submit button
-const submitButton = document.getElementById('submitButton');
-submitButton.addEventListener('click', handleSubmitButtonClick);
-submitButton.disabled = true;
+const foundWordsContainer = document.getElementById('foundWordsContainer');
+foundWordsContainer.classList.add('hidden');
+const levelContainer = document.getElementById('levelContainer');
+levelContainer.classList.add('hidden');
+const nextButton = document.getElementById('nextButton');
+nextButton.classList.add('hidden');
+getWordSet();
