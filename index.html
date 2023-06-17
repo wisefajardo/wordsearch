@@ -4,20 +4,42 @@
 <head>
   <title>Word Search Game</title>
   <link rel="stylesheet" type="text/css" href="style.css">
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container">
     <h1>Word Search Game</h1>
-    <div class="level" id="level"></div>
-    <div class="word-search" id="gridContainer"></div>
-    <div class="found-words">
-      <h2>Found Words:</h2>
-      <ul id="foundWords"></ul>
-    </div>
-    <div class="success-message hidden" id="successMessage">Congratulations! You found all the words. Click Submit for the next word set</div>
-    <button id="submitButton">Submit</button>
+
+    <!-- Word Set Input Section -->
+<div id="wordInputContainer">
+  <input type="text" id="wordInput" placeholder="Enter a word">
+  <button id="submitButton">Submit</button>
+  <button id="newWordSetButton">New Word Set</button>
+  <button id="startGameButton">Start Game</button>
+</div>
+
+<!-- Word Sets Display Section -->
+<h2 id="wordSetsLabel">Word Sets:</h2>
+<div id="wordSetsContainer"></div>
+
+<!-- Game Section -->
+<div id="levelContainer" >
+  <div class="level" id="level"></div>
+</div>
+<div class="word-search hidden" id="gridContainer" ></div>
+<div id="foundWordsContainer" >
+  <div class="found-words">
+    <h2>Found Words:</h2>
+    <ul id="foundWords"></ul>
   </div>
+</div>
+<div class="success-message hidden" id="successMessage">Congratulations! You found all the words. Click Next to proceed</div>
+<button id="nextButton">Next</button>
 
   <script src="script.js"></script>
 </body>
