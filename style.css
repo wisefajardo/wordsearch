@@ -81,3 +81,15 @@ h1 {
 .hidden {
   display: none;
 }
+
+.input-container {
+  margin-bottom: 10px;
+}
+
+.word-set {
+  margin-bottom: 10px;
+}
+
+.set-indicator {
+  margin-top: 10px;
+}
