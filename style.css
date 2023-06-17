@@ -1,0 +1,83 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.level {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.word-search {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 40px; /* Adjust the size as needed */
+  height: 40px; /* Adjust the size as needed */
+}
+
+.cell:hover {
+  background-color: #e0e0e0;
+}
+
+.highlight {
+  background-color: yellow;
+  color: black;
+}
+
+.confirmed {
+  background-color: green;
+  color: white;
+}
+
+.found-words {
+  margin-bottom: 20px;
+}
+
+.found-words h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.found-words ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.found-words li {
+  margin-bottom: 5px;
+}
+
+.success-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
