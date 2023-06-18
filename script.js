@@ -1,5 +1,5 @@
 // Word sets for each level
-const MAX_WORDS_PER_SET = 20; // Maximum number of words per word set
+const MAX_WORDS_PER_SET = 30; // Maximum number of words per word set
 const wordSets = [[]]; // Array to store word sets
 
 const ROW_DIRECTIONS = [-1, -1, 0, 1, 1, 1, 0, -1];
@@ -134,6 +134,46 @@ function renderAllWordSets() {
     for (const word of wordSet) {
       const listItem = document.createElement('li');
       listItem.textContent = word;
+	  
+	  // Add event listener to each word item
+      listItem.addEventListener('click', function () {
+  if (!listItem.querySelector('input')) {
+    const originalWord = listItem.textContent; // Store the original word value
+    const currentWordSet = wordSets[i]; // Store the current wordSet array
+
+    const inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.value = originalWord;
+
+    inputElement.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        const newWord = inputElement.value.toUpperCase(); // Convert to uppercase
+        if (newWord === '') {
+          // If input value is empty, remove the list item and update the wordSets array
+          listItem.parentNode.removeChild(listItem);
+          const wordIndex = currentWordSet.indexOf(originalWord);
+          if (wordIndex !== -1) {
+            currentWordSet.splice(wordIndex, 1);
+          }
+        } else if (newWord !== originalWord && !currentWordSet.includes(newWord)) {
+          // If the new word is different and does not exist in the word set
+          listItem.textContent = newWord;
+          const wordIndex = currentWordSet.indexOf(originalWord);
+          if (wordIndex !== -1) {
+            currentWordSet[wordIndex] = newWord;
+          }
+          // Add your logic to update the string or perform other actions with the new value
+        }
+      }
+    });
+
+    // Replace the list item content with the input element
+    listItem.textContent = '';
+    listItem.appendChild(inputElement);
+    inputElement.focus();
+  }
+      });
+	  
       list.appendChild(listItem);
     }
 
@@ -141,6 +181,7 @@ function renderAllWordSets() {
     const setIndicator = document.createElement('li');
     setIndicator.classList.add('set-indicator');
     setIndicator.textContent = `Set ${setNumber}`;
+	setIndicator.style.fontWeight = 'bold';
 
     // Append the set number indicator and the list to the container
     wordSetsContainer.appendChild(setIndicator);
@@ -189,8 +230,6 @@ function handleNewWordSetButtonClick() {
   renderAllWordSets();
 }
 
-
-
 // Add event listeners to the buttons and input field
 const submitButton = document.getElementById('submitButton');
 submitButton.addEventListener('click', handleSubmitButtonClick);
@@ -208,12 +247,17 @@ newWordSetButton.addEventListener('click', handleNewWordSetButtonClick);
 
 // Function to generate the word search grid
 function generateWordSearchGrid(wordSet) {
+  const gridSize = 12; // Size of the grid (12x12)
+  const cellSize = 40; // Adjust the size of the cells as needed
+  const gridContainer = document.getElementById("gridContainer");
+  gridContainer.innerHTML = ''; // Clear any existing grid cells
+
   const grid = [];
 
   // Generate an empty grid
-  for (let row = 0; row < 15; row++) {
+  for (let row = 0; row < gridSize; row++) {
     const rowArray = [];
-    for (let col = 0; col < 15; col++) {
+    for (let col = 0; col < gridSize; col++) {
       rowArray.push('');
     }
     grid.push(rowArray);
@@ -224,8 +268,8 @@ function generateWordSearchGrid(wordSet) {
     let wordPlaced = false;
 
     while (!wordPlaced) {
-      const randomRowIndex = Math.floor(Math.random() * 15);
-      const randomColIndex = Math.floor(Math.random() * 15);
+      const randomRowIndex = Math.floor(Math.random() * gridSize);
+      const randomColIndex = Math.floor(Math.random() * gridSize);
       const randomDirectionIndex = Math.floor(Math.random() * ROW_DIRECTIONS.length);
       const direction = [ROW_DIRECTIONS[randomDirectionIndex], COL_DIRECTIONS[randomDirectionIndex]];
 
@@ -237,13 +281,28 @@ function generateWordSearchGrid(wordSet) {
   }
 
   // Fill empty cells with random letters
-  for (let row = 0; row < 15; row++) {
-    for (let col = 0; col < 15; col++) {
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
       if (grid[row][col] === '') {
         grid[row][col] = getRandomLetter();
       }
     }
   }
+
+  // Generate the grid cells and append them to the grid container
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.style.width = cellSize + "px";
+      cell.style.height = cellSize + "px";
+      gridContainer.appendChild(cell);
+    }
+  }
+
+  // Adjust the grid-template-columns property of the word-search class
+  const wordSearch = document.querySelector(".word-search");
+  wordSearch.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
 
   return grid;
 }
@@ -264,7 +323,7 @@ function isWordPlaceable(grid, word, rowIndex, colIndex, direction) {
   // Check if the word can be placed within the boundaries of the grid
   const lastRow = rowIndex + rowDirection * (wordLength - 1);
   const lastCol = colIndex + colDirection * (wordLength - 1);
-  if (lastRow < 0 || lastRow >= 15 || lastCol < 0 || lastCol >= 15) {
+  if (lastRow < 0 || lastRow >= 12 || lastCol < 0 || lastCol >= 12) {
     return false;
   }
 
@@ -289,7 +348,7 @@ function placeWordInGrid(grid, word, rowIndex, colIndex, direction) {
     const currentRow = rowIndex + rowDirection * i;
     const currentCol = colIndex + colDirection * i;
 
-    grid[currentRow][currentCol] = word.charAt(i);
+    grid[currentRow][currentCol] = word.charAt(i); 
   }
 }
 
@@ -298,8 +357,8 @@ function renderWordSearchGrid(grid) {
   const gridContainer = document.getElementById('gridContainer');
   gridContainer.innerHTML = '';
 
-  for (let row = 0; row < 15; row++) {
-    for (let col = 0; col < 15; col++) {
+  for (let row = 0; row < 12; row++) {
+    for (let col = 0; col < 12; col++) {
       const cell = document.createElement('div');
       cell.classList.add('cell');
       cell.dataset.row = row;
@@ -313,10 +372,37 @@ function renderWordSearchGrid(grid) {
   gridContainer.addEventListener('click', handleCellClick);
 }
 
+// Function to getAdjacent letter
+function getNextLetter(row, col, direction) {
+  const [rowDirection, colDirection] = direction;
+
+  const nextRow = row + rowDirection;
+  const nextCol = col + colDirection;
+
+  // Check if the next cell is within the boundaries of the grid
+  if (nextRow >= 0 && nextRow < 12 && nextCol >= 0 && nextCol < 12) {
+    const nextCell = wordSearchGrid[nextRow][nextCol];
+	console.log("row ", row);
+	console.log("col ", col);
+	console.log("next cell ", nextCell);
+    return nextCell;
+  }
+
+  return null;
+}
+
 // Function to handle click event on cells
 function handleCellClick(event) {
   const clickedCell = event.target;
+  let direction;
+  
+  const isAdjacent = selectedCells.some(cell => {
+    const rowDiff = Math.abs(cell.dataset.row - clickedCell.dataset.row);
+    const colDiff = Math.abs(cell.dataset.col - clickedCell.dataset.col);
+    return rowDiff <= 1 && colDiff <= 1;
+  });
 
+	
   if (roundEnded) {
     return; // Ignore clicks if the round has ended
   }
@@ -325,6 +411,7 @@ function handleCellClick(event) {
   if (!clickedCell.classList.contains('cell')) {
     return; // Ignore clicks outside the grid
   }
+
 
   // Check if the clicked cell is already highlighted with yellow
   if (clickedCell.classList.contains('highlight')) {
@@ -335,12 +422,6 @@ function handleCellClick(event) {
     }
   } else if (!clickedCell.classList.contains('confirmed')) { // Check if the cell is not confirmed (highlighted green)
     // Check if the clicked cell is adjacent to the previously clicked cells
-    const isAdjacent = selectedCells.some(cell => {
-      const rowDiff = Math.abs(cell.dataset.row - clickedCell.dataset.row);
-      const colDiff = Math.abs(cell.dataset.col - clickedCell.dataset.col);
-      return (rowDiff <= 1 && colDiff <= 1);
-    });
-
     if (!isAdjacent) {
       // Clicked cell is not adjacent to the highlighted cells
       for (const cell of selectedCells) {
@@ -349,21 +430,52 @@ function handleCellClick(event) {
       selectedCells = [];
       selectedWordString = '';
     }
-
     clickedCell.classList.add('highlight');
     selectedCells.push(clickedCell);
-  }
-
-  // Update the selected word string
+	
+	 // Update the selected word string
   const selectedWord = selectedCells.map(cell => cell.textContent).join('');
   selectedWordString += selectedWord; // Concatenate the selected word to the string
+  
+   // Check if the next letter is available
+  const previousCell = selectedCells[selectedCells.length - 2];
+  if(previousCell != null){
+	  console.log("prev cell ", previousCell);
+  const rowDiff = clickedCell.dataset.row - previousCell?.dataset.row;
+  const colDiff = clickedCell.dataset.col - previousCell?.dataset.col;
 
-  // Log the selected word string
-  console.log('Selected Word:', selectedWordString);
-  console.log('Selected Word:', selectedCells.map(cell => cell.textContent));
+  //let direction;
+  if (rowDiff === 0 && colDiff === -1) {
+    direction = [0, -1]; // LEFT
+  } else if (rowDiff === 0 && colDiff === 1) {
+    direction = [0, 1]; // RIGHT
+  } else if (rowDiff === -1 && colDiff === 0) {
+    direction = [-1, 0]; // UP
+  } else if (rowDiff === 1 && colDiff === 0) {
+    direction = [1, 0]; // DOWN
+  } else if (rowDiff === -1 && colDiff === -1) {
+    direction = [-1, -1]; // UP_LEFT
+  } else if (rowDiff === -1 && colDiff === 1) {
+    direction = [-1, 1]; // UP_RIGHT
+  } else if (rowDiff === 1 && colDiff === -1) {
+    direction = [1, -1]; // DOWN_LEFT
+  } else if (rowDiff === 1 && colDiff === 1) {
+    direction = [1, 1]; // DOWN_RIGHT
+  }
 
-  // Check if the selected word string matches any word in the word set
-  if (wordsToFind.includes(selectedWordString)) {
+  let nextLetter = getNextLetter(
+    parseInt(clickedCell.dataset.row),
+    parseInt(clickedCell.dataset.col),
+    direction
+  );
+  
+   console.log("Direction2:", direction);
+  let potentialWord = selectedWordString + nextLetter;
+  const foundPotentialWord = wordsToFind.some(word => word.startsWith(potentialWord));
+  
+  if(foundPotentialWord){// Check if the potential word string matches any word in the word set
+	  console.log("potential word in list ",potentialWord);
+  } else if (wordsToFind.includes(selectedWordString)) { // Check if the selected word string matches any word in the word set
     // Valid word found
     foundWords.push(selectedWordString);
     renderFoundWords();
@@ -378,10 +490,22 @@ function handleCellClick(event) {
     selectedCells = [];
     checkGameStatus();
   }
+  }
+  } else if(clickedCell.classList.contains('confirmed')){
+	  console.log('Confirmed clicked');
+		selectedCells.push(clickedCell);
+	}
+
+  // Log the selected word string
+  console.log('Selected Word:', selectedWordString);
+  console.log('Selected Word:', selectedCells.map(cell => cell.textContent));
+  
   // Reset the selected word string
   selectedWordString = '';
   event.stopPropagation();
 }
+
+
 
 function removeHighlight() {
   for (const cell of selectedCells) {
