@@ -1,5 +1,5 @@
 // Word sets for each level
-const MAX_WORDS_PER_SET = 30; // Maximum number of words per word set
+const MAX_WORDS_PER_SET = 20; // Maximum number of words per word set
 const wordSets = [[]]; // Array to store word sets
 
 const ROW_DIRECTIONS = [-1, -1, 0, 1, 1, 1, 0, -1];
